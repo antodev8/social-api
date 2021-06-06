@@ -41,5 +41,7 @@ class UsersSeeder extends Seeder
 
         $user->roles()->attach(Role::where('key', Role::ROLE_GUEST_USER)->first());
 
+        //User::factory()->count(50)->create();
+
     }
 }

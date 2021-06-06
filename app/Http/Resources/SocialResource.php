@@ -18,6 +18,7 @@ class SocialResource extends JsonResource
             'id' => $this->id,
             'title' => $this->title,
             'is_approved_by_post_author' => $this->is_approved_by_post_author,
+            'is_approved_by_guest_user' => $this->is_approved_by_guest_user,
             'description' => $this->description,
             'author' => new UserResource($this->whenLoaded('author'))
 

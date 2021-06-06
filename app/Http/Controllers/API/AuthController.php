@@ -30,6 +30,8 @@ class AuthController extends Controller
 
             }
 
+          //return response()->json($user->createToken($user->email)->plainTextToken);
+
 
         return new AuthLoginResource($user);
 

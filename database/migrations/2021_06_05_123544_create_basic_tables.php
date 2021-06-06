@@ -1,11 +1,12 @@
 <?php
 
 use App\Models\SocialLog;
+use Carbon\Carbon;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePostsTable extends Migration
+class CreateBasicTables extends Migration
 {
     /**
      * Run the migrations.
@@ -28,7 +29,7 @@ class CreatePostsTable extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->foreign('role_id')->references('id')->on('roles');
         });
-        Schema::create('sectors',function (Blueprint $table){
+        Schema::create('sectors', function (Blueprint $table){
             $table->tinyIncrements('id');
             $table->string('name');
             $table->string('key')->unique();
@@ -36,14 +37,14 @@ class CreatePostsTable extends Migration
             $table->timestamps();
         });
 
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('socials', function (Blueprint $table) {
             $table->id();
             $table->unsignedTinyInteger('sector_id');
             $table->unsignedBigInteger('author_id');
-            $table->boolean('post_author')->default(false);
-            $table->boolean('guest_user')->default(false);
+            $table->boolean('is_approved_by_post_author')->default(false);
+            $table->boolean('is_approved_by_guest_user')->default(false);
             $table->string('title');
-            $table->string('description');
+            $table->string('text');
             $table->foreign('author_id')->references('id')->on('users');
             $table->foreign('sector_id')->references('id')->on('sectors');
             $table->timestamps();
@@ -55,7 +56,7 @@ class CreatePostsTable extends Migration
             $table->unsignedBigInteger('user_id');
             $table->enum('action',[SocialLog::ACTION_CREATE,SocialLog::ACTION_UPDATE,SocialLog::ACTION_DESTROY]);
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('social_id')->references('id')->on('social')->onDelete('cascade');
+            $table->foreign('social_id')->references('id')->on('socials')->onDelete('cascade');
             $table->timestamps();
         });
 
@@ -69,7 +70,7 @@ class CreatePostsTable extends Migration
     public function down()
     {
         Schema::dropIfExists('social_logs');
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('socials');
         Schema::dropIfExists('sectors');
         Schema::dropIfExists('user_role');
         Schema::dropIfExists('roles');

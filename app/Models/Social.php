@@ -30,20 +30,23 @@ class Social extends Model
     protected $fillable = [
         'title',
         'description',
+        'text',
         'sector_id',
         'author_id',
         'is_approved_by_post_author',
+        'is_approved_by_guest_user',
 
     ];
 
     protected $casts = [
         'is_approved_by_post_author' => 'boolean',
+        'is_approved_by_guest_user' => 'boolean',
 
     ];
     public static function booted()
     {
         static::created(queueable(function ($social) {
-            StoreSocialLogJob::dispatchAfterResponse(Auth::id(), $social->id, SocialLog::ACTION_CREATE);
+            StoreSocialLogJob::dispatchAfterResponse($social->author_id, $social->id, SocialLog::ACTION_CREATE);
         }));
 
         static::updated(queueable(function ($social) {

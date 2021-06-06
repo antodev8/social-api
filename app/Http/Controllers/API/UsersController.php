@@ -39,6 +39,7 @@ class UsersController extends Controller
                 $query->where('title','like', '%' . $text . '%')
                 ->orWhere('email', 'like', '%' . $text . '%');
             });
+        }
             $users = $users->paginate((int)$per_page);
 
          // Include relationship
@@ -56,25 +57,26 @@ class UsersController extends Controller
      * @return UserResource
      * @throws Exception
      */
+
     public function store(UserStoreRequest $request): UserResource
     {
-        db::beginTransaction();
+        DB::beginTransaction();
+
         try {
-        $user = new User();
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = Hash::make('password');
-        $user->save();
+            $user = new User();
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->password = Hash::make($request->password);
+            $user->save();
 
-        $user->roles()->attach(Role::find($request->role_id));
+            $user->roles()->attach(Role::find($request->role_id));
 
-        db::commit();
-    }
-    catch(Exception $exception){
-        db::rollBack();
-        throw $exception;
+            DB::commit();
+        } catch (Exception $exception) {
 
-    }
+            DB::rollBack();
+            throw $exception;
+        }
         return new UserResource($user);
     }
 
