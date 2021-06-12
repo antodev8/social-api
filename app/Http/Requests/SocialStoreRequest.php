@@ -26,8 +26,11 @@ class SocialStoreRequest extends FormRequest
     {
         return [
             'title' => 'required|string',
+            'text' => 'required|string',
             'sector' => 'required|exists:sectors,id',
             'author_id' => 'sometimes|exists:users,id',
+            'tag_id' => 'sometimes|exists:tags,id',
+            'post_id' => 'sometimes|exists:posts,id',
         ];
     }
 }

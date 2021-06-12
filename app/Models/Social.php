@@ -6,6 +6,7 @@ use App\Jobs\StoreSocialLogJob;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -33,6 +34,7 @@ class Social extends Model
         'text',
         'sector_id',
         'author_id',
+        'tag_id',
         'is_approved_by_post_author',
         'is_approved_by_guest_user',
 
@@ -89,6 +91,15 @@ class Social extends Model
     public function logs(): HasMany
     {
         return $this->hasMany(SocialLog::class,'social_id');
+    }
+    /**
+     * Get tags
+     *
+     * @return
+     */
+    public function tags(): BelongsToMany
+    {
+        return $this->belongsToMany('App\Models\Tag', 'post_tag','tag_id', 'post_id');
     }
     /**
      * Scopes

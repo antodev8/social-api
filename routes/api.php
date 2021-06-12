@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\SocialController;
+use App\Http\Controllers\API\TagsController;
 use App\Http\Controllers\API\UsersController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,6 +23,13 @@ Route::group([
 
     // Login route
     Route::post('login', [AuthController::class, 'login']);
+    // Logout route
+    Route::post('logout', [AuthController::class,'logout']);
+
+    Route::post('/add/social', [App\Http\Controllers\SocialController::class, 'addSocial']);
+
+    Route::get('/socials', [App\Http\Controllers\SocialController::class, 'socials'])->name('socials');
+
 
     Route::group([
         'middleware' => ['auth:sanctum']
@@ -29,10 +37,14 @@ Route::group([
 
         Route::post('socials/{id}/upload-file', [SocialController::class, 'uploadFile']);
 
+
+
+
         // Resources routes
         Route::apiResources([
             'users' => UsersController::class,
             'socials' => SocialController::class,
+
         ]);
     });
 });

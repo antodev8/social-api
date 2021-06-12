@@ -100,4 +100,6 @@ class User extends Authenticatable
     {
         return $this->hasRole(Role::ROLE_GUEST_USER);
     }
+
+
 }

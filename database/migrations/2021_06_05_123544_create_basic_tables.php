@@ -41,12 +41,15 @@ class CreateBasicTables extends Migration
             $table->id();
             $table->unsignedTinyInteger('sector_id');
             $table->unsignedBigInteger('author_id');
+            $table->unsignedBigInteger('user_id');
             $table->boolean('is_approved_by_post_author')->default(false);
             $table->boolean('is_approved_by_guest_user')->default(false);
             $table->string('title');
             $table->string('text');
+            $table->string('description');
             $table->foreign('author_id')->references('id')->on('users');
             $table->foreign('sector_id')->references('id')->on('sectors');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -59,6 +62,20 @@ class CreateBasicTables extends Migration
             $table->foreign('social_id')->references('id')->on('socials')->onDelete('cascade');
             $table->timestamps();
         });
+        Schema::create('tags', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('tag_name');
+            $table->string('slug');
+            $table->timestamps();
+        });
+        Schema::create('post_tag', function(Blueprint $table)
+        {
+            $table->integer('post_id')->unsigned()->index();
+            $table->foreign('post_id')->references('id')->on('post_tag')->onUpdate('cascade')->onDelete('cascade');
+            $table->integer('tag_id')->unsigned()->index();
+            $table->foreign('tag_id')->references('id')->on('tags')->onUpdate('cascade')->onDelete('cascade');
+        });
+
 
     }
 
@@ -74,5 +91,7 @@ class CreateBasicTables extends Migration
         Schema::dropIfExists('sectors');
         Schema::dropIfExists('user_role');
         Schema::dropIfExists('roles');
+        Schema::dropIfExists('tags');
+        Schema::dropIfExists('post_tag');
     }
 }

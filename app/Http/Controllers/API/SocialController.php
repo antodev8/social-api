@@ -11,10 +11,12 @@ use App\Http\Requests\SocialDestroyRequest;
 use App\Http\Resources\SocialResource;
 use App\Models\Social;
 use App\Models\Role;
+use App\Models\Tag;
 use App\Models\User;
 use Exception;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Support\Str;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
@@ -42,6 +44,7 @@ class SocialController extends Controller
         $socials->byUserRole(Auth::user()->roleKey());
 
     }
+
     // Filter by text
     if ($text = $request->query('text')) {
         $socials->where(function ($query) use ($text) {
@@ -73,6 +76,10 @@ class SocialController extends Controller
             $social = new Social();
             $social->title = $request->title;
             $social->description = $request->description;
+            $social->text = $request->text;
+            $social->tag_id = $request->tag_id;
+            $social->post_id = $request->post_id;
+            $social->user_id = $request->user_id;
             $social->sector_id = $request->sector_id;
             $social->author_id = $request->has('author_id') ? $request->author_id : Auth::id();
             $social->save();
@@ -85,6 +92,7 @@ class SocialController extends Controller
         }
 
         return new SocialResource($social);
+
     }
      /**
      * Display the specified resource.
@@ -157,4 +165,38 @@ class SocialController extends Controller
 
         return response(null, 204);
     }
+
+    // *****CREATE POST*****
+
+    public function socials()
+{
+$socials = Social::orderBy('id','desc')->get();
+return view('socials',compact('socials'));
+}
+// *****ADD POST AND TAG ID*******
+
+public function addSocial(SocialStoreRequest $request)
+{
+    $social = new Social();
+    $social->title = $request->title;
+    $social->text = $request->text;
+    $social->save();
+    $tags = $request->tag;
+    $tagNames = [];
+    if (!empty($tags)) {
+    foreach ($tags as $tagName)
+    {
+    $tag = Tag::firstOrCreate(['name'=>$tagName, 'slug'=>Str::slug($tagName)]);
+    if($tag)
+    {
+    $tagNames[] = $tag->id;
+    }
+    }
+    $social->tags()->syncWithoutDetaching($tagNames);
+    }
+    return redirect()->route('socials')->with('success','Post created successfully');
+    }
+
+
+
 }
