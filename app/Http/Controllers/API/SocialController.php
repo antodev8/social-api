@@ -27,6 +27,37 @@ use Illuminate\Support\Facades\Storage;
 
 class SocialController extends Controller
 {
+
+     // *****CREATE POST*****
+
+     public function socials()
+     {
+     $socials = Social::orderBy('id','desc')->get();
+     return view('socials',compact('socials'));
+     }
+     // *****ADD POST AND TAG ID*******
+
+     public function addSocial(SocialStoreRequest $request)
+     {
+         $social = new Social();
+         $social->title = $request->title;
+         $social->text = $request->text;
+         $social->save();
+         $tags = $request->tag;
+         $tagNames = [];
+         if (!empty($tags)) {
+         foreach ($tags as $tagName)
+         {
+         $tag = Tag::firstOrCreate(['name'=>$tagName, 'slug'=>Str::slug($tagName)]);
+         if($tag)
+         {
+         $tagNames[] = $tag->id;
+         }
+         }
+         $social->tags()->syncWithoutDetaching($tagNames);
+         }
+         return redirect()->route('socials')->with('success','Post created successfully');
+         }
     /**
      * Display a listing of the resource.
      *
@@ -164,37 +195,6 @@ class SocialController extends Controller
         $social->delete();
 
         return response(null, 204);
-    }
-
-    // *****CREATE POST*****
-
-    public function socials()
-{
-$socials = Social::orderBy('id','desc')->get();
-return view('socials',compact('socials'));
-}
-// *****ADD POST AND TAG ID*******
-
-public function addSocial(SocialStoreRequest $request)
-{
-    $social = new Social();
-    $social->title = $request->title;
-    $social->text = $request->text;
-    $social->save();
-    $tags = $request->tag;
-    $tagNames = [];
-    if (!empty($tags)) {
-    foreach ($tags as $tagName)
-    {
-    $tag = Tag::firstOrCreate(['name'=>$tagName, 'slug'=>Str::slug($tagName)]);
-    if($tag)
-    {
-    $tagNames[] = $tag->id;
-    }
-    }
-    $social->tags()->syncWithoutDetaching($tagNames);
-    }
-    return redirect()->route('socials')->with('success','Post created successfully');
     }
 
 
